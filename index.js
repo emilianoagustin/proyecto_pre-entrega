@@ -16,6 +16,16 @@ import { writeFile, readFile, stat } from "node:fs/promises";
 
 let products, productId, jsonData;
 
+const baseProduct = {
+  id: 0,
+  title: "default",
+  price: 0,
+  description: "default",
+  category: "default",
+  image: "default",
+  rating: { rate: 0, count: 0 },
+};
+
 const DB = "db.json";
 const URL = "https://fakestoreapi.com/products";
 const args = process.argv.slice(2);
@@ -31,6 +41,13 @@ const productCategory = args[4];
 
 const isEmptyDB = async () => (await stat(DB)).size === 0;
 
+async function saveData(DB, data) {
+  await writeFile(DB, JSON.stringify(data), "utf8", (err) => {
+    if (err) throw new Error("There was an error writing the data:", err);
+    console.log("The file has been saved!");
+  });
+}
+
 async function fetchErrorHandler(response) {
   const errorData = await response.json().catch(() => null);
   const errorMessage =
@@ -43,10 +60,7 @@ async function fetchData(url) {
     const response = await fetch(url);
     if (!response.ok) await fetchErrorHandler(response);
     const data = await response.json();
-    writeFile(DB, JSON.stringify(data), "utf8", (err) => {
-      if (err) throw new Error("There was an error writing the data:", err);
-      console.log("The file has been saved!");
-    });
+    await saveData(DB, data);
   } catch (error) {
     console.error(
       "Fetching data stopped with the following error --->",
@@ -55,7 +69,6 @@ async function fetchData(url) {
   }
 }
 
-// METHODS WHICH READS DATA FROM LOCAL JSON FILE
 async function readData(file, id) {
   try {
     const fileData = await readFile(file, "utf8");
@@ -88,72 +101,47 @@ async function readData(file, id) {
   }
 }
 
-// METHODS WHICH MAKES FETCHING TO THE API
-async function getProducts() {
+async function deleteProductData(file, id) {
   try {
-    const response = await fetch(URL);
-    if (!response.ok) await fetchErrorHandler(response);
-    const data = await response.json();
-    console.table(data);
+    const fileData = await readFile(file, "utf8");
+    jsonData = JSON.parse(fileData);
+    let product = jsonData.find((prod) => prod.id === id);
+    if (!product)
+      return console.log(`The product with the id ${id} does not exists.`);
+    let filteredProducts = jsonData.filter((prod) => prod.id !== id);
+    await saveData(file, filteredProducts);
+    console.log(`Deleted product with id: ${id}`);
+    console.table(product);
+    console.log(`Updated product list`);
+    console.table(await readData(file));
   } catch (error) {
     console.error(
-      "Application stopped with the following error --->",
+      "An error ocurred trying to delete the product --->",
       error.message
     );
   } finally {
-    console.log("Request ended");
+    console.log("Delete process ended.");
   }
 }
 
-async function getProduct(productId) {
+async function newProduct(file, title, price, category) {
   try {
-    const response = await fetch(`${URL}/${productId}`);
-    const data = await response.json();
-    console.table(data);
+    const fileData = await readFile(file, "utf8");
+    jsonData = JSON.parse(fileData);
+    const product = {
+      ...baseProduct,
+      id: jsonData[jsonData.length - 1].id + 1,
+      title,
+      price,
+      category,
+    };
+    jsonData.push(product);
+    await saveData(file, jsonData);
+    await readData(file);
   } catch (error) {
-    console.error(
-      "Application stopped with the following error --->",
-      error.message
-    );
+    console.log(`An error ocurred creating the new product: ${error.message}`);
   } finally {
-    console.log("Request ended");
-  }
-}
-
-async function deleteProduct(productId) {
-  try {
-    const response = await fetch(`${URL}/${productId}`, { method: "DELETE" });
-    const data = await response.json();
-    console.table(data);
-  } catch (error) {
-    console.error(
-      "Application stopped with the following error --->",
-      error.message
-    );
-  } finally {
-    console.log("Request ended");
-  }
-}
-
-async function createProduct(title, price, category) {
-  const product = { title, price, category };
-  const config = {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(product),
-  };
-
-  try {
-    const response = await fetch(URL, config);
-    const data = await response.json();
-    console.table(data);
-  } catch (error) {
-    console.error(
-      "Application stopped with the following error --->",
-      error.message
-    );
-  } finally {
-    console.log("Request ended");
+    console.log("The process to create a new product has ended.");
   }
 }
 
@@ -165,12 +153,28 @@ switch (method) {
     else await readData(DB);
     break;
   case "DELETE":
-    deleteProduct(productId);
+    await deleteProductData(DB, productId);
     break;
   case "POST":
-    createProduct(productTitle, productPrice, productCategory);
+    await newProduct(DB, productTitle, productPrice, productCategory);
     break;
   default:
-    console.log("default case");
+    console.log(new Error("An unknown method requested"));
     break;
 }
+
+// switch (method) {
+//   case "GET":
+//     if (productId) await getProduct(productId);
+//     else await getProducts();
+//     break;
+//   case "DELETE":
+//     deleteProduct(productId);
+//     break;
+//   case "POST":
+//     createProduct(productTitle, productPrice, productCategory);
+//     break;
+//   default:
+//     console.log("default case");
+//     break;
+// }
