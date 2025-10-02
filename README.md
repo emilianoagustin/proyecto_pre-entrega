@@ -57,3 +57,13 @@ npm run start POST products "Saco de pana" 2300.00 abrigos
 Devuelve por consola el producto creado
 En el título se usan comillas dobles si tiene más de una palabra
 ```
+
+## Extra
+
+Para simular una base de datos se debe tener en cuenta lo siguiente:
+
+- Renombrar archivo `indexToFileVersion.js` a `index.js`
+
+- Crear un archivo `db.json` en la raíz del proyecto
+
+Con esto configurado solo resta usar los comandos como se explica en la sección "scripts"
