@@ -44,15 +44,16 @@ npm run start DELETE products/<id>
 ## Ejemplos
 
 ```javascript
+npm run start GET products
+Devuelve por consola el listado completo de los productos
+
 npm run start GET products/1
 Devuelve por consola el producto buscado
 
 npm run start DELETE products/1
 Devuelve por consola el producto eliminado
-seguido de la lista de todos los productos actualizada
 
 npm run start POST products "Saco de pana" 2300.00 abrigos
-Devuelve por consola la lista de productos actualizada
-con el producto nuevo
+Devuelve por consola el producto creado
 En el título se usan comillas dobles si tiene más de una palabra
 ```
