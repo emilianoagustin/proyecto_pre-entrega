@@ -75,7 +75,7 @@ async function deleteProduct(productId) {
 }
 
 async function createProduct([title, price, category]) {
-  const product = { title, price, category };
+  const product = { title, price: Number(price), category };
   const config = {
     method: "POST",
     headers: { "Content-Type": "application/json" },
