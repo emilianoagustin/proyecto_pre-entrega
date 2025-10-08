@@ -1,14 +1,23 @@
 let products, productId, jsonData;
 
+// CONSTANTS
 const DB = "db.json";
 const URL = "https://fakestoreapi.com/products";
-const args = process.argv.slice(2);
-const method = args[0].toUpperCase();
-args[1].includes("/") ? (productId = args[1].slice(9)) : (products = args[1]);
-const productTitle = args[2];
-const productPrice = Number(args[3]);
-const productCategory = args[4];
 
+// ARGUMENTS
+
+let [, , initialMethod, resource, ...params] = process.argv;
+const method = initialMethod.toUpperCase();
+let id = null;
+
+if (resource.includes("/")) {
+  let charIndex = resource.indexOf("/");
+  let resourceCopy = resource;
+  resource = resource.slice(0, charIndex).toLowerCase();
+  id = resourceCopy.slice(charIndex + 1);
+}
+
+// ERROR HANDLER METHOD
 async function fetchErrorHandler(response) {
   const errorData = await response.json().catch(() => null);
   const errorMessage =
@@ -16,6 +25,7 @@ async function fetchErrorHandler(response) {
   throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
 }
 
+// CRUD METHODS
 async function getProducts() {
   try {
     const response = await fetch(URL);
@@ -64,7 +74,7 @@ async function deleteProduct(productId) {
   }
 }
 
-async function createProduct(title, price, category) {
+async function createProduct([title, price, category]) {
   const product = { title, price, category };
   const config = {
     method: "POST",
@@ -89,16 +99,20 @@ async function createProduct(title, price, category) {
 
 switch (method) {
   case "GET":
-    if (productId) await getProduct(productId);
-    else await getProducts();
+    if (resource === "products") {
+      if (id) await getProduct(id);
+      else await getProducts();
+    } else console.log("Error: Some argument is missing or misspelled");
     break;
   case "DELETE":
-    deleteProduct(productId);
+    if (resource === "products") deleteProduct(id);
+    else console.log("Error: Some argument is missing or misspelled");
     break;
   case "POST":
-    createProduct(productTitle, productPrice, productCategory);
+    if (resource === "products") createProduct(params);
+    else console.log("Error: Some argument is missing or misspelled");
     break;
   default:
-    console.log("default case");
+    console.log("Error: You entered an invalid method");
     break;
 }
