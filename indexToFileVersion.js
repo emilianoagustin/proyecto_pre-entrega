@@ -30,8 +30,6 @@ const DB = "db.json";
 const URL = "https://fakestoreapi.com/products";
 const args = process.argv.slice(2);
 const method = args[0].toUpperCase();
-//TO USE WITH METHODS THAT MAKES CALLS TO THE API
-// args[1].includes("/") ? (productId = args[1].slice(9)) : (products = args[1]);
 args[1].includes("/")
   ? (productId = Number(args[1].slice(9)))
   : (products = args[1]);

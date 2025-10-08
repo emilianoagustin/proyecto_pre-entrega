@@ -45,24 +45,25 @@ npm run start DELETE products/<id>
 
 ```javascript
 npm run start GET products
-Devuelve por consola el listado completo de los productos
+Devuelve por consola el listado completo de los productos.
 
 npm run start GET products/1
-Devuelve por consola el producto buscado
+Devuelve por consola el producto buscado.
 
 npm run start DELETE products/1
-Devuelve por consola el producto eliminado
+Devuelve por consola el producto eliminado.
 
 npm run start POST products "Saco de pana" 2300.00 abrigos
-Devuelve por consola el producto creado
-En el título se usan comillas dobles si tiene más de una palabra
+Devuelve por consola el producto creado.
+
+Para poder enviar un `title` con espacios es necesario encerrarlo entre comillas dobles, como se ve en el ejemplo de arriba.
 ```
 
 ## Extra
 
 Para simular una base de datos se debe tener en cuenta lo siguiente:
 
-- Renombrar archivo `indexToFileVersion.js` a `index.js`
+- Renombrar archivo `indexToFileVersion.js` a `index.js` (reescribir el existente o renombrarlo)
 
 - Crear un archivo `db.json` en la raíz del proyecto
 
