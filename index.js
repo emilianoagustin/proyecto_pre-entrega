@@ -5,7 +5,6 @@ const DB = "db.json";
 const URL = "https://fakestoreapi.com/products";
 
 // ARGUMENTS
-
 let [, , initialMethod, resource, ...params] = process.argv;
 const method = initialMethod.toUpperCase();
 let id = null;
@@ -25,8 +24,8 @@ async function fetchErrorHandler(response) {
   throw new Error(`Error HTTP: ${response.status} - ${errorMessage}`);
 }
 
-// CRUD METHODS
-async function getProducts() {
+// HTTP METHODS
+async function getAllProducts() {
   try {
     const response = await fetch(URL);
     if (!response.ok) await fetchErrorHandler(response);
@@ -100,8 +99,8 @@ async function createProduct([title, price, category]) {
 switch (method) {
   case "GET":
     if (resource === "products") {
-      if (id) await getProduct(id);
-      else await getProducts();
+      if (id) getProduct(id);
+      else getAllProducts();
     } else console.log("Error: Some argument is missing or misspelled");
     break;
   case "DELETE":
